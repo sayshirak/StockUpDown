@@ -16,7 +16,7 @@ def onMotion(event):
         contain = Cure.contains(event)
         if contain:
              #设置标注的终点和文本位置,设置标注可见
-            annot. xy =(x,y)
+            annot.xy =(x,y)
             annot.set_text(str(y))#设置标注文本
             annot.set_visible(True)#标注可见
         else:
@@ -49,23 +49,25 @@ for i in range(dfSZZS.shape[0]):
 SZZSScatter = np.asarray(SZZSScatter)
 #将str类型的数据转换为datetime.date类型的数据，作为x坐标，这样不会出现排序混乱的问题
 dt = [datetime.strptime(d, '%Y/%m/%d').date() for d in SZZSScatter[0:,0]]
-plt.figure(figsize=(20,10))
-#坐标轴标签
-plt.xlabel('日期',color='g')
-plt.ylabel('涨跌幅',color='g')
+
+
 #纵轴刻度
 #plt.ylim(0,100)
 #plt.yticks([0,2,4,6,7,10], ['0', '2B', '4B', '8B', '10B'])
 #plt.yticks(np.arange(-1, 2, step=0.1))
 #plt.grid(True)
-scatter = plt.scatter(dt, SZZSScatter[0:,1],  color='black')
-Cure = plt.plot(dt, SZZSScatter[0:,1], color='blue', linewidth=3)
-ax = plt.figure().gca()
-annot= ax.annotate("",xy=(100,200))
-annot.set_visible(False)
-plt.figure().canvas.mpl_connect( 'motion_notify_event', onMotion)
 
-plt.show(Cure)
+fig = plt.figure(figsize=(20,10))
+ax = fig.gca()
+#坐标轴标签
+annot= ax.annotate("",xy=(0,0),xytext=(20,20))#,textcoords='offfset points',bbox=dict(boxstyle='round',fc='w',),arrowprops=dict(arrowstyle='->'))
+annot.set_visible(False)
+Cure = plt.scatter(dt, SZZSScatter[0:,1],  color='black')
+plt.plot(dt, SZZSScatter[0:,1], color='blue', linewidth=3)
+fig.canvas.mpl_connect( 'motion_notify_event', onMotion)
+plt.xlabel('日期',color='g')
+plt.ylabel('涨跌幅',color='g')
+plt.show()
 
 print('SZZScount: %d'% SZZScount)
 print('totalSZZSCount: %d'% totalSZZSCount)
