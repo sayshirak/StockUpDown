@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+'''
+鼠标悬停事件
+'''
+
 def onMotion(event):
     #获取鼠标位置和标注可见性
     x = event.xdata
@@ -38,11 +42,7 @@ y= np.sin(x)
 sinCurve, =plt.plot(x,y, #绘图数据
                      picker=2, color='blue', linewidth=3)#鼠标距离曲线2个像素可识别
 #创建标注对象
-annot= ax.annotate("",
-             xy=(0,0))#, itext=(-50,50),#标注箭头位置和文本相对位置
-             #extcoords=" offset pixels",#相对于xy的偏移量单位(像素
-             #bbox=dict( boxsty1e=" round",fc="r"),#圆角,红色背景
-             #arrowprops=dict( arrowsty1e="<->"))#标注箭头形状
+annot= ax.annotate("",xy=(100, 100), xytext=(-0,0),arrowprops=dict(arrowstyle="->"))
 
 annot.set_visible(False)
 

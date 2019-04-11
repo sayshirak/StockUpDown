@@ -19,26 +19,21 @@ mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
 mpl.rcParams['axes.unicode_minus'] = False # 解决保存图像是负号'-'显示为方块的问题
 
 def onMotion(event):
-    #ind = event.ind
-    if ( mdates.num2date(event.xdata).tm_sec > 0 ):
-        return
-    x = mdates.num2date(event.xdata)
-    y = event.ydata
-    visible = annot.get_visible()
-    if event.inaxes == ax:
-    #测试鼠标事件是否发生在曲线上
-        contain,_ = cure.contains(event)
-        if contain:
-             #设置标注的终点和文本位置,设置标注可见
-            annot.xy =(1,2)
-            annot.set_text('1,2')#设置标注文本
-            annot.set_visible(True)#标注可见
-            print(x, y)
-        else:
-             #鼠标不在曲线附近,设置标注为不可见
-            if visible:
-                annot.set_visible(False)
-        event.canvas.draw_idle()
+    ind = event.ind
+    x = str(np.take(dt, ind)[0].year) + '-' + str(np.take(dt, ind)[0].month) + '-' + str(np.take(dt, ind)[0].day)
+    y = np.take(SZZSScatter[0:,1], ind)[0]
+    annot= ax.annotate("", xy=(x, float(y)),
+                       xytext=(str(x), str(y)), arrowprops=dict(arrowstyle="->"))
+    annot.xy =(str(x), str(y))
+    annot.set_text((annot.xy))#设置标注文本
+    '''
+    是否可以在这里直接设置标注
+    annot= ax.annotate("", xy=('1990/12/20', y),
+                       xytext=('11'), arrowprops=dict(arrowstyle="->"))
+    annot.set_visible(True)#标注可见
+    '''
+    print(x, y)
+    event.canvas.draw_idle()
 
 dfSZZS = pd.read_csv('SZZS.csv')
 dfDJI = pd.read_csv('DJI.csv')
@@ -81,12 +76,12 @@ plt.ylabel('涨跌幅',color='g')
 #plt.yticks(np.arange(-1, 2, step=0.1))
 plt.grid(True)
 
-scatter = plt.scatter(dt, SZZSScatter[0:,1],  color='black',picker=False)
-cure, = plt.plot(dt, SZZSScatter[0:,1], color='blue', linewidth=3)
+scatter = plt.scatter(dt, SZZSScatter[0:,1],  color='black',picker=True)
+cure = plt.plot(dt, SZZSScatter[0:,1], color='blue', linewidth=3)
 #创建标注对象
-annot= ax.annotate("",xy=(0,0))
+annot= ax.annotate("",xy=(0, 0), xytext=(0,0), arrowprops=dict(arrowstyle="->"))
 annot.set_visible(True)
-fig.canvas.mpl_connect( 'motion_notify_event', onMotion)
+fig.canvas.mpl_connect( 'pick_event', onMotion)
 
 show()
 
