@@ -2,31 +2,41 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from datetime import datetime
 from pylab import mpl
+from matplotlib.pyplot import figure, show
+
+'''
+matplotlib日期
+https://matplotlib.org/api/dates_api.html#matplotlib.dates.datestr2num
+设置matplotlib横坐标为日期格式
+https://blog.csdn.net/helunqu2017/article/details/78736686
+'''
+
+
+mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
+mpl.rcParams['axes.unicode_minus'] = False # 解决保存图像是负号'-'显示为方块的问题
 
 def onMotion(event):
-   #获取鼠标位置和标注可见性
-    x = event.xdata
+    #ind = event.ind
+    x = mdates.num2date(event.xdata)
     y = event.ydata
     visible = annot.get_visible()
     if event.inaxes == ax:
     #测试鼠标事件是否发生在曲线上
-
-        contain = Cure.contains(event)
+        contain,_ = cure.contains(event)
         if contain:
              #设置标注的终点和文本位置,设置标注可见
-            annot. xy =(x,y)
-            annot.set_text(str(y))#设置标注文本
+            annot.xy =(1,2)
+            annot.set_text('1,2')#设置标注文本
             annot.set_visible(True)#标注可见
+            print(x, y)
         else:
              #鼠标不在曲线附近,设置标注为不可见
             if visible:
                 annot.set_visible(False)
         event.canvas.draw_idle()
-
-mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
-mpl.rcParams['axes.unicode_minus'] = False # 解决保存图像是负号'-'显示为方块的问题
 
 dfSZZS = pd.read_csv('SZZS.csv')
 dfDJI = pd.read_csv('DJI.csv')
@@ -43,29 +53,40 @@ for i in range(dfSZZS.shape[0]):
         continue
     else:
         totalSZZSCount += 1
-    if abs(float(dfSZZS.iloc[i,1])) >= 0.05:
+    if abs(float(dfSZZS.iloc[i,1])) >= 0.1:
         SZZScount += 1
         SZZSScatter.append([dfSZZS.iloc[i,0],dfSZZS.iloc[i,1]])
 SZZSScatter = np.asarray(SZZSScatter)
 #将str类型的数据转换为datetime.date类型的数据，作为x坐标，这样不会出现排序混乱的问题
 dt = [datetime.strptime(d, '%Y/%m/%d').date() for d in SZZSScatter[0:,0]]
-plt.figure(figsize=(20,10))
+#dt = [ mdates.datestr2num(d) for d in SZZSScatter[0:,0]  ]
+
+#指定绘图板大小
+fig = plt.figure(figsize=(15,8))
+ax = fig.gca()
+#指定横坐标为日期
+ax.xaxis_date()
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y/%m/%d'))
+#指定横坐标每一格的单位,使用了自动分配
+#也可以使用DayLocator(bymonthday=[1,32])
+ax.xaxis.set_major_locator(mdates.AutoDateLocator())
 #坐标轴标签
 plt.xlabel('日期',color='g')
 plt.ylabel('涨跌幅',color='g')
 #纵轴刻度
-#plt.ylim(0,100)
-#plt.yticks([0,2,4,6,7,10], ['0', '2B', '4B', '8B', '10B'])
+#plt.ylim(-1,2)
+#plt.yticks([-1,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.6,1.8,2], [-1,-0.8,-0.6,-0.4,-0.2,0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.6,1.8,2])
 #plt.yticks(np.arange(-1, 2, step=0.1))
-#plt.grid(True)
-scatter = plt.scatter(dt, SZZSScatter[0:,1],  color='black')
-Cure = plt.plot(dt, SZZSScatter[0:,1], color='blue', linewidth=3)
-ax = plt.figure().gca()
-annot= ax.annotate("",xy=(100,200))
-annot.set_visible(False)
-plt.figure().canvas.mpl_connect( 'motion_notify_event', onMotion)
+plt.grid(True)
 
-plt.show(Cure)
+scatter = plt.scatter(dt, SZZSScatter[0:,1],  color='black',picker=False)
+cure, = plt.plot(dt, SZZSScatter[0:,1], color='blue', linewidth=3)
+#创建标注对象
+annot= ax.annotate("",xy=(0,0))
+annot.set_visible(True)
+fig.canvas.mpl_connect( 'motion_notify_event', onMotion)
+
+show()
 
 print('SZZScount: %d'% SZZScount)
 print('totalSZZSCount: %d'% totalSZZSCount)
