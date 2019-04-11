@@ -20,6 +20,8 @@ mpl.rcParams['axes.unicode_minus'] = False # 解决保存图像是负号'-'显�
 
 def onMotion(event):
     #ind = event.ind
+    if ( mdates.num2date(event.xdata).tm_sec > 0 ):
+        return
     x = mdates.num2date(event.xdata)
     y = event.ydata
     visible = annot.get_visible()
