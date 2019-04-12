@@ -19,13 +19,17 @@ mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
 mpl.rcParams['axes.unicode_minus'] = False # 解决保存图像是负号'-'显示为方块的问题
 
 def onMotion(event):
+    event.canvas.draw_idle()
     ind = event.ind
     x = str(np.take(dt, ind)[0].year) + '-' + str(np.take(dt, ind)[0].month) + '-' + str(np.take(dt, ind)[0].day)
     y = np.take(SZZSScatter[0:,1], ind)[0]
     annot= ax.annotate("", xy=(x, float(y)),
-                       xytext=(str(x), str(y)), arrowprops=dict(arrowstyle="->"))
+                       xytext=(str(x), str(y)),
+                       arrowprops=dict(headwidth=10,headlength=20,facecolor='red'),
+                       visible=False)
     annot.xy =(str(x), str(y))
     annot.set_text((annot.xy))#设置标注文本
+    annot.set_visible(True)
     '''
     是否可以在这里直接设置标注
     annot= ax.annotate("", xy=('1990/12/20', y),
@@ -79,9 +83,8 @@ plt.grid(True)
 scatter = plt.scatter(dt, SZZSScatter[0:,1],  color='black',picker=True)
 cure = plt.plot(dt, SZZSScatter[0:,1], color='blue', linewidth=3)
 #创建标注对象
-annot= ax.annotate("",xy=(0, 0), xytext=(0,0), arrowprops=dict(arrowstyle="->"))
-annot.set_visible(True)
-fig.canvas.mpl_connect( 'pick_event', onMotion)
+#annot= ax.annotate("",xy=(0, 0), xytext=(0,0), arrowprops=dict(arrowstyle="->"), visible=False)
+fig.canvas.mpl_connect( 'motion_notify_event', onMotion)
 
 show()
 
